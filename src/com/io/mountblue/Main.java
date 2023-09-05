@@ -14,6 +14,18 @@ public class Main {
     private static final String ECONOMY_QUERY_YEAR = "2015";
     private static final String MOST_SIXES_QUERY_YEAR = "2016";
     private static final String MOST_STRIKE_QUERY_YEAR = "2012";
+    private static final int MATCH_ID = 0;
+    private static final int SEASON = 1;
+    private static final int WINNER = 10;
+    private static final int VENUE = 14;
+    private static final int BOWLING_TEAM = 3;
+    private static final int EXTRA_RUNS =  16;
+    private static final int BOWLER = 8;
+    private static final int RUNS_CONCEDED = 17;
+    private static final int BATSMAN = 7;
+    private static final int RUNS_SCORED_BY_BATSMAN  = 15;
+    private static final int COUNT_TO_PRINT = 10;
+
 
     public static void main(String[] args)  {
         List<Match> matches = addMatchesData();
@@ -33,6 +45,39 @@ public class Main {
         findMostEconomicalBowlerGivenYear(matches, deliveries, yearCorrespondingGivenId);
 
         findMostStrikeRateBatsman(matches, deliveries, yearCorrespondingGivenId);
+
+        findMostSixesByBatsmanPerVenue(matches, deliveries, yearCorrespondingGivenId);
+
+    }
+
+
+    private static void findMostSixesByBatsmanPerVenue(List<Match> matches, List<Delivery> deliveries, Map<String, String> yearCorrespondingGivenId) {
+        Map<String, String> venueCorrespondingId = new HashMap<>();
+
+        Map<String, List<Map.Entry<String, Integer>>> batsmanSixesListCorrespondingVenue = new HashMap<>();
+
+        for(Match match : matches) {
+            venueCorrespondingId.put(match.getId(), match.getVenue());
+        }
+
+        for(Delivery delivery : deliveries) {
+            String matchId = delivery.getId();
+            String year = yearCorrespondingGivenId.get(matchId);
+            if(year.equals(MOST_SIXES_QUERY_YEAR)) {
+                // now we have to see these deliveries which a batsman and if it goes for six;
+                int runsScoredByBatsman = delivery.getRunsScoredByBatsman();
+                if(runsScoredByBatsman == 6) {
+                    // store the venue accoridinly go with batsman-sixes map
+                    String venue = venueCorrespondingId.get(matchId);
+                    String batsman = delivery.getBatsman();
+
+
+//                    batsmanSixesListCorrespondingVenue.put(venue, batsmanSixesListCorrespondingVenue.getOrDefault(venue, new ArrayList<>()).add(Map.entry(batsman, )));
+
+                }
+            }
+        }
+
     }
 
     private static void findMostStrikeRateBatsman(List<Match> matches, List<Delivery> deliveries, Map<String, String> yearCorrespondingGivenId) {
@@ -58,11 +103,14 @@ public class Main {
         }
 
         Collections.sort(strikeRatePerBatsman, Comparator.comparingDouble(Map.Entry :: getValue));
+        Collections.reverse(strikeRatePerBatsman);
 
         System.out.println("\n Most Strike Rate By Batsman in"+ MOST_STRIKE_QUERY_YEAR + " : ");
-
+        int countToPrint = COUNT_TO_PRINT;
         for(Map.Entry<String, Double> economyData : strikeRatePerBatsman) {
-            System.out.println(economyData.getKey() + " : " + economyData.getValue());
+            if (countToPrint-- > 0) {
+                System.out.println(economyData.getKey() + " : " + economyData.getValue());
+            }
         }
     }
 
@@ -93,9 +141,12 @@ public class Main {
         Collections.sort(economyConcededGivenBowler, Comparator.comparingDouble(Map.Entry :: getValue));
 
         System.out.println("\n Top Economical Bowlers of "+ ECONOMY_QUERY_YEAR + " : ");
+        int countToPrint = COUNT_TO_PRINT;
 
         for(Map.Entry<String, Double> economyData : economyConcededGivenBowler) {
-            System.out.println(economyData.getKey() + " : " + economyData.getValue());
+            if (countToPrint-- > 0) {
+                System.out.println(economyData.getKey() + " : " + economyData.getValue());
+            }
         }
     }
 
@@ -157,10 +208,10 @@ public class Main {
                 String[] data = line.split(",");
 
                 Match match = new Match();
-                match.setId(data[0]);
-                match.setSeason(data[1]);
-                match.setWinner(data[10]);
-                match.setVenue(data[14]);
+                match.setId(data[MATCH_ID]);
+                match.setSeason(data[SEASON]);
+                match.setWinner(data[WINNER]);
+                match.setVenue(data[VENUE]);
 
                 matches.add(match);
             }
@@ -187,15 +238,15 @@ public class Main {
                 String[] data = line.split(",");
 
                 Delivery delivery = new Delivery();
-                delivery.setId(data[0]);
-                delivery.setBowlingTeam(data[3]);
-                int extraRuns = Integer.parseInt(data[16]);
+                delivery.setId(data[MATCH_ID]);
+                delivery.setBowlingTeam(data[BOWLING_TEAM]);
+                int extraRuns = Integer.parseInt(data[EXTRA_RUNS]);
                 delivery.setExtraRuns(extraRuns);
-                delivery.setBowler(data[8]);
-                int runsConceded = Integer.parseInt(data[17]);
+                delivery.setBowler(data[BOWLER]);
+                int runsConceded = Integer.parseInt(data[RUNS_CONCEDED]);
                 delivery.setRunsConceded(runsConceded);
-                delivery.setBatsman(data[7]);
-                int runsScoredByBatsman = Integer.parseInt((data[15]));
+                delivery.setBatsman(data[BATSMAN]);
+                int runsScoredByBatsman = Integer.parseInt((data[RUNS_SCORED_BY_BATSMAN]));
                 delivery.setRunsScoredByBatsman(runsScoredByBatsman);
 
                 deliveries.add(delivery);
